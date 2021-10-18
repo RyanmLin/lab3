@@ -1,0 +1,14 @@
+D:\Documents\Fourth Year\CPEN 333\lab3\Lab3\bin\Debug\netcoreapp3.1\Lab3.exe
+D:\Documents\Fourth Year\CPEN 333\lab3\Lab3\bin\Debug\netcoreapp3.1\Lab3.deps.json
+D:\Documents\Fourth Year\CPEN 333\lab3\Lab3\bin\Debug\netcoreapp3.1\Lab3.runtimeconfig.json
+D:\Documents\Fourth Year\CPEN 333\lab3\Lab3\bin\Debug\netcoreapp3.1\Lab3.runtimeconfig.dev.json
+D:\Documents\Fourth Year\CPEN 333\lab3\Lab3\bin\Debug\netcoreapp3.1\Lab3.dll
+D:\Documents\Fourth Year\CPEN 333\lab3\Lab3\bin\Debug\netcoreapp3.1\Lab3.pdb
+D:\Documents\Fourth Year\CPEN 333\lab3\Lab3\obj\Debug\netcoreapp3.1\Lab3.csproj.AssemblyReference.cache
+D:\Documents\Fourth Year\CPEN 333\lab3\Lab3\obj\Debug\netcoreapp3.1\Lab3.GeneratedMSBuildEditorConfig.editorconfig
+D:\Documents\Fourth Year\CPEN 333\lab3\Lab3\obj\Debug\netcoreapp3.1\Lab3.AssemblyInfoInputs.cache
+D:\Documents\Fourth Year\CPEN 333\lab3\Lab3\obj\Debug\netcoreapp3.1\Lab3.AssemblyInfo.cs
+D:\Documents\Fourth Year\CPEN 333\lab3\Lab3\obj\Debug\netcoreapp3.1\Lab3.csproj.CoreCompileInputs.cache
+D:\Documents\Fourth Year\CPEN 333\lab3\Lab3\obj\Debug\netcoreapp3.1\Lab3.dll
+D:\Documents\Fourth Year\CPEN 333\lab3\Lab3\obj\Debug\netcoreapp3.1\Lab3.pdb
+D:\Documents\Fourth Year\CPEN 333\lab3\Lab3\obj\Debug\netcoreapp3.1\Lab3.genruntimeconfig.cache
