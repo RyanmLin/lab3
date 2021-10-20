@@ -104,7 +104,7 @@ namespace Lab3
             {
                 newList.Add(new Tuple<int, string>(character.Value, character.Key));
             }
-
+            wordcount.Clear();
             return newList;
         }
 
