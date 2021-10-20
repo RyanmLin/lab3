@@ -1,0 +1,339 @@
+using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Threading;
+
+namespace Lab3
+{
+    class WordCountTester
+    {
+        static int Main()
+        {
+            string mode = "s";
+            // map and mutex for thread safety
+            Mutex mutex = new Mutex();
+            Dictionary<string, int> wordcountSingleThread = new Dictionary<string, int>();
+
+            Dictionary<string, int> wordcountMultiThread = new Dictionary<string, int>();
+
+            List<Tuple<int, string>> newList = new List<Tuple<int, string>>();
+
+            var filenames = new List<string> {
+                "data/shakespeare_antony_cleopatra.txt",
+                "data/shakespeare_hamlet.txt",
+                "data/shakespeare_julius_caesar.txt",
+                "data/shakespeare_king_lear.txt",
+                "data/shakespeare_macbeth.txt",
+                "data/shakespeare_merchant_of_venice.txt",
+                "data/shakespeare_midsummer_nights_dream.txt",
+                "data/shakespeare_much_ado.txt",
+                "data/shakespeare_othello.txt",
+                "data/shakespeare_romeo_and_juliet.txt",
+               };
+
+            //=============================================================
+            // YOUR IMPLEMENTATION HERE TO COUNT WORDS IN SINGLE AND MULTIPLE THREADS
+            //=============================================================
+            Console.WriteLine("Write 's' for single thread and 'm' for multi thread");
+            mode = Console.ReadLine();
+            if (mode == "s")
+            {
+                Console.WriteLine("Running Single Thread Implementation");
+                Console.WriteLine("press enter");
+                Console.ReadLine();
+                // Single Thread Implementation
+                foreach (string play in filenames)
+                {
+                    Console.WriteLine("For the play: " + play);
+                    HelperFunctions.CountCharacterWords("D:/Documents/Fourth Year/CPEN 333/lab3/" + play, mutex, wordcountSingleThread);
+
+                    newList = HelperFunctions.SortCharactersByWordcount(wordcountSingleThread);
+
+                    HelperFunctions.PrintListofTuples(newList);
+                    Console.WriteLine(" ");
+                    Console.WriteLine(" ");
+                    Console.WriteLine(" ");
+                }
+            }
+            else if (mode == "m")
+            {
+                Console.WriteLine("Running Multi Thread Implementation");
+                Console.WriteLine("press enter");
+                Console.ReadLine();
+                // Multi Thread Implementation
+                foreach (string play in filenames)
+                {
+                    NewThread(play, mutex, wordcountMultiThread, newList);
+                }
+            }
+            else
+            {
+                Console.WriteLine("Must type s or m. Good Bye");
+            }
+
+            Console.WriteLine("Done");
+            return 0;
+        }
+
+        public static Thread NewThread(string filename, Mutex mutex, Dictionary<string, int> wcounts, List<Tuple<int, string>> printableList)
+        {
+            var t = new Thread(() => DoThings(filename, mutex, wcounts, printableList));
+            t.Start();
+            t.Join();
+            //PrintArray(array);
+            return t;
+        }
+
+        static void DoThings(string filename, Mutex mutex, Dictionary<string, int> wcounts, List<Tuple<int, string>> printableList)
+        {
+            Console.WriteLine("For the play: " + filename);
+            HelperFunctions.CountCharacterWords("D:/Documents/Fourth Year/CPEN 333/lab3/" + filename, mutex, wcounts);
+
+            printableList = HelperFunctions.SortCharactersByWordcount(wcounts);
+
+            HelperFunctions.PrintListofTuples(printableList);
+            Console.WriteLine(" ");
+            Console.WriteLine(" ");
+            Console.WriteLine(" ");
+        }
+
+        /**
+        * Tests word_count for the given line and starting index
+        * @param line line in which to search for words
+        * @param start_idx starting index in line to search for words
+        * @param expected expected answer
+        * @throws UnitTestException if the test fails
+        */
+        static void WCTester(string line, int start_idx, int expected)
+        {
+            int result = 0;
+            // TO DO
+            // Call your WordCount(ref line, start_idx) method
+            result = HelperFunctions.WordCount(ref line, start_idx);
+
+            // if not what we expect, throw an error
+            if (result != expected)
+            {
+                throw new UnitTestException(ref line, start_idx, result, expected, String.Format("UnitTestFailed: result:{0} expected:{1}, line: {2} starting from index {3}", result, expected, line, start_idx));
+            }
+
+        }
+
+        /////////////////////////////////////////////////////////////////////////////////
+        /// Code for WordCount testing ///////////
+        /////////////////////////////////////////////////////////////////////////////////
+        /*
+            try
+            {
+
+                // To DO:
+                // YOUR TESTS HERE. Create a large list which includes the line, the // starting index and the expected result. You would want to check //// all the edge case scenarios.
+                string line = "The brown fox jumped over the lazy dog";
+                int startIdx = 0;
+                int expectedResults = 8;
+
+                WCTester(line, startIdx, expectedResults);
+
+            }
+            catch (UnitTestException e)
+            {
+                Console.WriteLine(e);
+            }
+        */
+    }
+}
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading;
+
+namespace Lab3
+{
+    class HelperFunctions
+    {
+        /**
+        * Counts number of words, separated by spaces, in a line.
+        * @param line string in which to count words
+        * @param start_idx starting index to search for words
+        * @return number of words in the line
+        */
+        public static int WordCount(ref string line, int start_idx)
+        {
+            // YOUR IMPLEMENTATION HERE
+            int count = 0;
+            bool countedWord = false;
+
+            for(int i = 0; i < line.Length; i++)
+            {
+                if(line[i] == ' ' && !countedWord)
+                {
+                    count++;
+                    countedWord = true;
+                }
+                if(line[i] != ' ')
+                {
+                    countedWord = false;
+                }
+            }
+            count++;
+
+            return count;
+        }
+
+
+        /**
+         * Checks if the line specifies a character's dialogue, returning
+         * the index of the start of the dialogue.  If the
+         * line specifies a new character is speaking, then extracts the
+         * character's name.
+         *
+         * Assumptions: (doesn't have to be perfect)
+         *     Line that starts with exactly two spaces has
+         *       CHARACTER. <dialogue>
+         *     Line that starts with exactly four spaces
+         *       continues the dialogue of previous character
+         *
+         * @param line line to check
+         * @param character extracted character name if new character,
+         *        otherwise leaves character unmodified
+         * @return index of start of dialogue if a dialogue line,
+         *      -1 if not a dialogue line
+         */
+        public static int IsDialogueLine(string line, ref string character)
+        {
+            // new character
+            if (line.Length >= 3 && line[0] == ' '
+                && line[1] == ' ' && line[2] != ' ')
+            {
+                // extract character name
+
+                int start_idx = 2;
+                int end_idx = 3;
+                while (end_idx <= line.Length && line[end_idx - 1] != '.')
+                {
+                    ++end_idx;
+                }
+
+                // no name found
+                if (end_idx >= line.Length)
+                {
+                    return 0;
+                }
+
+                // extract character's name
+                character = line.Substring(start_idx, end_idx - start_idx - 1);
+                return end_idx;
+            }
+
+            // previous character
+            if (line.Length >= 5 && line[0] == ' '
+                && line[1] == ' ' && line[2] == ' '
+                && line[3] == ' ' && line[4] != ' ')
+            {
+                // continuation
+                return 4;
+            }
+
+            return 0;
+        }
+
+
+        public static List<Tuple<int, string>> SortCharactersByWordcount(Dictionary<string, int> wordcount)
+        {
+            // Implement sorting by word count here
+            List<Tuple<int, string>> newList = new List<Tuple<int, string>>();
+
+            foreach(KeyValuePair<string, int> character in wordcount.OrderByDescending(key => key.Value))
+            {
+                newList.Add(new Tuple<int, string>(character.Value, character.Key));
+            }
+            wordcount.Clear();
+            return newList;
+        }
+
+        /**
+        * Reads a file to count the number of words each actor speaks.
+        *
+        * @param filename file to open
+        * @param mutex mutex for protected access to the shared wcounts map
+        * @param wcounts a shared map from character -> word count
+        */
+        public static void CountCharacterWords(string filename,
+                                 Mutex mutex,
+                                 Dictionary<string, int> wcounts)
+        {
+            //===============================================
+            //  IMPLEMENT THREAD SAFETY IN THIS METHOD
+            //===============================================
+
+            int index;
+            string line;  // for storing each line read from the file
+            string character = "";  // empty character to start
+            System.IO.StreamReader file = new System.IO.StreamReader(filename);
+
+            while ((line = file.ReadLine()) != null)
+            {
+                //=================================================
+                // YOUR JOB TO ADD WORD COUNT INFORMATION TO MAP
+                //=================================================
+
+                // Is the line a dialogueLine?
+                index = IsDialogueLine(line, ref character); // gets the index of when dialogue starts. Also gets character name
+                if (index != 0) // Checks if the line is a dialogue Line
+                {
+
+                    if (index > 0 && character !=  "") // Checks that index is greater than 0 and that there is a character
+                    {
+                        int wordsInLine = WordCount(ref line, index); // Gets the number of words in the dialogue
+                        if(wcounts.ContainsKey(character)) // checks dictionary for the key
+                        {
+                            wcounts[character] += wordsInLine; // adds the line word count to existing word count
+                        }
+                        else
+                        {
+                            wcounts.Add(character, wordsInLine); // Adds a new key-value to the dictionary
+                        }
+                    }
+                    character = ""; // resets character
+                }
+            }
+            // Close the file
+            file.Close();
+        }
+
+        public static void PrintListofTuples(List<Tuple<int, string>> printableList)
+        {
+            // Prints the list of tuples
+            foreach(Tuple<int, string> character in printableList)
+            {
+                Console.WriteLine("{0} spoke {1} words in this play", character.Item2, character.Item1);
+            }
+        }
+    }
+}
+
+using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace Lab3
+{
+    public class UnitTestException : Exception
+    {
+        private string line_;
+        private int idx_;
+        private int results_;
+        private int expected_;
+
+        public UnitTestException(ref string line, int idx, int results, int expected, string message) :
+          base(message)
+        {
+            line_ = line;
+            idx_ = idx;
+            results_ = results;
+            expected_ = expected;
+        }
+    }
+}
