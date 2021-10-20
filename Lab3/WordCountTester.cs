@@ -12,15 +12,14 @@ namespace Lab3
 
             // map and mutex for thread safety
             Mutex mutex = new Mutex();
-            Dictionary<string, int> wordcountSingleThread = new Dictionary<string, int>();
 
             Dictionary<string, int> wordcountMultiThread = new Dictionary<string, int>();
 
+            List<Tuple<int, string>> newList = new List<Tuple<int, string>>();
+
             var filenames = new List<string> {
-                "data/shakespeare_antony_cleopatra.txt"
-                ,
-                "data/shakespeare_hamlet.txt"
-                ,
+                "data/shakespeare_antony_cleopatra.txt",
+                "data/shakespeare_hamlet.txt",
                 "data/shakespeare_julius_caesar.txt",
                 "data/shakespeare_king_lear.txt",
                 "data/shakespeare_macbeth.txt",
@@ -34,8 +33,21 @@ namespace Lab3
             //=============================================================
             // YOUR IMPLEMENTATION HERE TO COUNT WORDS IN SINGLE AND MULTIPLE THREADS
             //=============================================================
+            // Single Thread Implementation
+            foreach(string play in filenames)
+            {
+                Dictionary<string, int> wordcountSingleThread = new Dictionary<string, int>();
+                Console.WriteLine("For the play: " + play);
+                HelperFunctions.CountCharacterWords("D:/Documents/Fourth Year/CPEN 333/lab3/" + play, mutex, wordcountSingleThread);
 
+                newList = HelperFunctions.SortCharactersByWordcount(wordcountSingleThread);
 
+                HelperFunctions.PrintListofTuples(newList);
+                Console.WriteLine(" ");
+                Console.WriteLine(" ");
+                Console.WriteLine(" ");
+            }
+            
 
             Console.WriteLine("Done");
             return 0;
