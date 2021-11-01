@@ -20,19 +20,20 @@ namespace Lab3
             int count = 0;
             bool countedWord = false;
 
-            for(int i = 0; i < line.Length; i++)
+            for(int i = start_idx; i < line.Length; i++)
             {
-                if(line[i] == ' ' && !countedWord)
+                if(char.IsWhiteSpace(line[i]))
+                {
+                    //count++;
+                    countedWord = false;
+                }
+                else if(!countedWord)
                 {
                     count++;
                     countedWord = true;
                 }
-                if(line[i] != ' ')
-                {
-                    countedWord = false;
-                }
             }
-            count++;
+            //count++;
 
             return count;
         }
@@ -151,7 +152,7 @@ namespace Lab3
                             wcounts.Add(character, wordsInLine); // Adds a new key-value to the dictionary
                         }
                     }
-                    character = ""; // resets character
+                    //character = ""; // resets character
                 }
             }
             // Close the file
